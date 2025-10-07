@@ -765,8 +765,7 @@ class PanelBendaUji(wx.Panel):
         self.btnTest.Enable(False)
         self.btnStop.Enable(False)
 
-    # mengakses webservice pada ERP untuk query benda uji berdasarkan Nomor
-    # Docket
+    # mengakses webservice pada ERP untuk query benda uji berdasarkan Nomor Docket
     def nomorDocket(self, event):
         logging.info(
             "Event pengambilan data benda uji pada saat penekanan tombol Enter"
@@ -1017,15 +1016,23 @@ class PanelBendaUji(wx.Panel):
             self.indexPort = self.chcPort.GetSelection()
             self.port = self.chcPort.GetString(self.indexPort)
             if self.txtStatusKoneksi.Value == "Tersambung !":
-                nilaikN = ctrlAlat.nilaiTekan(self.port)
-                self.txtBeban.SetValue(str(nilaikN))
-                jenis = self.txtJenisBUJ.GetValue()
-                mpaNya = knToMpa(nilaikN, jenis)
-                kgNya = knToKgCm(nilaikN, jenis)
-                self.txtMpa.SetValue(mpaNya)
-                self.txtKg.SetValue(kgNya)
-                print(mpaNya)
-                print(kgNya)
+                self.gen = ctrlAlat.nilaiTekan(self.port)
+                def updateBeban():
+                    try:
+                        nilaiKN = next(self.gen)
+                        self.txtBeban.SetValue(str(nilaiKN))
+                        wx.CallLater(200, updateBeban)  # loop lagi tiap 200ms
+                        jenis = self.txtJenisBUJ.GetValue()
+                        mpaNya = knToMpa(nilaiKN, jenis)
+                        kgNya = knToKgCm(nilaiKN, jenis)
+                        self.txtMpa.SetValue(mpaNya)
+                        self.txtKg.SetValue(kgNya)
+                        print(mpaNya)
+                        print(kgNya)
+                    except StopIteration:
+                        pass
+                    except Exception as e:
+                        wx.MessageBox(str(e), "Error Update", wx.OK | wx.ICON_ERROR)
 
             else:
                 pesanError = "Alat belum tersambung, lakukan Test Koneksi"
