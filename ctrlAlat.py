@@ -82,8 +82,7 @@ def nilaiTekan(port):
                     data_str = datanya.decode("utf-8", errors="ignore").strip()
                     if "ovalue" in data_str.lower():
                         nilaiKN = data_str.split()[1]
-                        ser.close()
-                        return nilaiKN
+                        yield nilaiKN #Fungsi Looping nilaiKN
     except Exception as e:
         pesanError = str(e)
         dlg = wx.MessageDialog(
